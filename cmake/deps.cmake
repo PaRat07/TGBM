@@ -3,8 +3,8 @@ include(cmake/get_cpm.cmake)
 CPMAddPackage(
   NAME OpenSSL
   GITHUB_REPOSITORY janbar/openssl-cmake
-  GIT_TAG 1.1.1w-20231130
-  OPTIONS "WITH_APPS OFF"
+  GIT_TAG 1.1.1w-20250419
+        OPTIONS "WITH_APPS OFF"
   EXCLUDE_FROM_ALL YES
   SYSTEM OFF
 )
