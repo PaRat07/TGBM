@@ -10,7 +10,7 @@ static tgbm::api::reply_markup_t make_inline_keyboard() {
 
   reply_markup_t markup;
   auto& m = markup.emplace<InlineKeyboardMarkup>();
-
+  InputTextMessageContent
   m.inline_keyboard = {
       {{.text = "Button 1", .data = button::callback_data{.value = "yes"}},
        {.text = "Button 2", .data = button::callback_data{.value = "no"}}},
