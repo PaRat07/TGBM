@@ -242,9 +242,29 @@ struct rj_tojson<W, A> {
       return;
     writer.StartObject();
     std::string_view d = v.discriminator_now();
-    (void)writer.Key(d.data(), d.size());
+    std::string_view kType = "type";
+    (void)writer.Key(kType.data(), kType.size());
+    writer.String(d.data(), d.size());
     v.data.visit(matcher{[](tgbm::nothing_t) { unreachable(); },
-                         [&]<typename T>(const T& x) { rj_tojson<W, T>::serialize(writer, x); }});
+                         [&]<typename T>(const T& x) {
+
+                           [] <typename At> (auto &writer, const At &v) {
+                             pfr_extension::visit_object(v, [&]<typename Info, typename Type>(const Type& field) {
+                               constexpr std::string_view name = Info::name.AsStringView();
+                               if constexpr (!At::is_mandatory_field(name)) {
+                                 auto* f = noexport::optional_field_get_value(field);
+                                 if (!f)
+                                   return;
+                                 (void)writer.Key(name.data(), name.size());
+                                 rj_tojson<W, std::remove_cvref_t<decltype(*f)>>::serialize(writer, *f);
+                               } else {
+                                 (void)writer.Key(name.data(), name.size());
+                                 rj_tojson<W, Type>::serialize(writer, field);
+                               }
+                             });
+                           } (writer, x);
+                           // rj_tojson<W, T>::serialize(writer, x);
+                         }});
     writer.EndObject();
   }
 };
